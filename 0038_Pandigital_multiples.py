@@ -30,12 +30,12 @@ from math import factorial
 
 
 def pandigital(position: int) -> int:
+    """ Function returns integer number from given position from combinations of 9 to 1 digits. """
     digit_list = [n for n in range(9, 0, -1)]
     help_list = digit_list.copy()
     result_list = []
     result_str = ''
     num_of_solutions = factorial(len(digit_list))
-
     while len(help_list) > 0:
         range_size = num_of_solutions // len(help_list)
         list_dig_within = (position-1) // range_size
@@ -50,6 +50,8 @@ def pandigital(position: int) -> int:
 
 
 def check_conditions(num) -> bool:
+    """ Function checks if problem conditions are fullfilled for the pandigital number given.
+    Condition: For A = int(str(num)[0:i] if str(A*1)+str(A*2)+...+str(A*n) == str(num) -> True"""
     num_str = str(num)
 
     for seq in range(1, (len(num_str)//2)):
@@ -97,4 +99,15 @@ def test_check_conditions():
 
 # --------------- RUN ---------------
 if __name__ == '__main__':
-    pass
+    result_number = 0
+    counter_num = 0
+    while counter_num <= 362880:
+        counter_num += 1
+        pandigit = pandigital(counter_num)
+        if check_conditions(pandigit):
+            result_number = pandigit
+            break
+    print(result_number)
+
+# ------------ RESULT -------------
+# 932718654
