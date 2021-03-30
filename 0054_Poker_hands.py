@@ -63,7 +63,7 @@ def compare_cards(plr1: int, pl2: int, *args) -> int:
 class Cards():
     values = ['2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A']
     colors = ['H', 'C', 'S', 'D']
-    scoring = {k: v for v, k in enumerate(values)}
+    scoring = {k: v for v, k in enumerate(values, start=2)}
 
     def __init__(self, cards: list):
         self.cards = cards
@@ -88,6 +88,17 @@ class Cards():
         if len(check_set) != 5:
             return True
         return False
+
+    def _consecutive_cards(self) -> bool:
+        """ Checks if all cards are consecutive."""
+        check_list = [self.scoring.get(card[0]) for card in self.cards]
+        check_list.sort()
+        print(check_list)
+
+        for i in range(1, 5):
+            if check_list[0] != check_list[i]-i:
+                return False
+        return True
 
     def no_ranked_cards(self) -> bool:
         """ Method checks if card set has any ranked figures. If has, returns True."""
@@ -128,11 +139,19 @@ class Cards():
         """ Method checks Straight, Flush, Straight Flush and Royal Flush type figures for a card set."""
         result = {}
 
-        if self._all_color():
-            highest = self.highest_card()
-            val = list(highest.values())[0]
-            result = {'Flush': val}
+        consecutive_cards = self._consecutive_cards()
+        all_color = self._all_color()
+        highest = self.highest_card()
+        val = list(highest.values())[0]
 
+        if consecutive_cards and all_color:
+            result = {'Straight Flush': val}
+        elif consecutive_cards:
+            result = {'Straight': val}
+        elif all_color:
+            result = {'Flush': val}
+        else:
+            return None
         return result
 
 # -------------- TESTS ---------------
@@ -167,7 +186,7 @@ def test_Cards():
     card_set_3 = ['8C', '8S', 'TS', 'TC', 'TD']
     card_set_4 = ['QC', 'QS', 'QD', 'QH', 'AS']
     card_set_5 = ['2S', '5S', '7S', 'TS', 'QS']
-    card_set_6 = ['8C', '8S', 'TS', 'TC', 'TD']
+    card_set_6 = ['4C', '5S', '6S', '7C', '8D']
     card_set_7 = ['QC', 'QS', 'QD', 'QH', 'AS']
 
     cards_1 = Cards(card_set_1)
@@ -181,12 +200,13 @@ def test_Cards():
     # then
     assert cards_1.no_ranked_cards() == True
     assert cards_2.no_ranked_cards() == False
-    assert cards_1.highest_card() == {'K': 11}
+    assert cards_1.highest_card() == {'K': 13}
     assert cards_1.repeated_card_values() == {}
     assert cards_2.repeated_card_values() == {'8': 2}
     assert cards_3.repeated_card_values() == {'8': 2, 'T': 3}
     assert cards_4.repeated_card_values() == {'Q': 4}
-    assert cards_5.straight_flush() == {'Flush': 10}
+    assert cards_5.straight_flush() == {'Flush': 12}
+    assert cards_6.straight_flush() == {'Straight Flush': 8}
 
 
 def test_compare_cards():
@@ -202,6 +222,8 @@ def test_compare_cards():
 
 # --------------- RUN ---------------
 if __name__ == '__main__':
-    pass
+    plr_1 = Cards(['4C', '5S', '6S', '7C', '8D'])
+    a = plr_1._consecutive_cards()
+    print(a)
 
 # ------------ RESULT -------------
