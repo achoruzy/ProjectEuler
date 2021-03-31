@@ -26,41 +26,55 @@ def timing(func):
     return wrapper()
 
 
-def get_file_data() -> list:
-    """ Generator function yields next list of cards in txt file row"""
-    file_path = './0054poker.txt'
-    with open(file_path, mode='r') as file:
-        while True:
-            line = file.readline()
-            if len(line) == 0:
-                raise StopIteration
-            line_list = line[0:-1].split(' ')
-            yield line_list
+class FileHandler():
+    """Class for handling poker files."""
+
+    def __init__(self, file_path: str):
+        self.file_path = file_path
+
+    def get_file_data() -> list:
+        """ Generator function yields next list of cards in txt file row"""
+        file_path = './0054poker.txt'
+        with open(file_path, mode='r') as file:
+            while True:
+                line = file.readline()
+                if len(line) == 0:
+                    raise StopIteration
+                line_list = line[0:-1].split(' ')
+                yield line_list
+
+    def split_players(card_list: list) -> tuple:
+        """ Returns cards split for players """
+        cards_split = []
+        no_cards_for_plr = int(len(card_list) / 2)
+        no_of_plrs = int(len(card_list) / 5)
+
+        for i in range(0, no_of_plrs):
+            ran_start = i * no_cards_for_plr
+            ran_stop = ((i + 1) * no_cards_for_plr)
+            plr = [i for i in card_list[ran_start:ran_stop]]
+            cards_split.append(plr)
+        return cards_split
 
 
-def split_players(card_list: list) -> tuple:
-    """ Returns cards split for players """
-    cards_split = []
-    no_cards_for_plr = int(len(card_list) / 2)
-    no_of_plrs = int(len(card_list) / 5)
+class PokerOperator():
+    """Class works as operator for players and game."""
 
-    for i in range(0, no_of_plrs):
-        ran_start = i * no_cards_for_plr
-        ran_stop = ((i + 1) * no_cards_for_plr)
-        plr = [i for i in card_list[ran_start:ran_stop]]
-        cards_split.append(plr)
-    return cards_split
+    def __init__(self, player_1: Cards, player_2: Cards, *args):
+        self.player_1 = player_1
+        self.player_2 = player_2
 
+    def compare_cards(self, self.player_1, , *args) -> int:
+        """ Compares card rankings of players. """
+        rankings = [i for i in (self.player_1, self.player_2, *args)]
+        winner = max(rankings)
+        winner_index = rankings.index(winner)
 
-def compare_cards(plr1: int, pl2: int, *args) -> int:
-    """ Compares card rankings of players. """
-    rankings = [i for i in (plr1, pl2, *args)]
-    winner = max(rankings)
-    winner_index = rankings.index(winner)
-    return winner_index+1
+        return winner_index+1
 
 
 class Cards():
+    """Class represents cards in player's hand."""
     values = ['2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A']
     colors = ['H', 'C', 'S', 'D']
     scoring = {k: v for v, k in enumerate(values, start=2)}
@@ -83,9 +97,10 @@ class Cards():
         check_set = set()
 
         for card in self.cards:
-            check_set.add(card[1])
+            color = card[1]
+            check_set.add(color)
 
-        if len(check_set) != 5:
+        if len(check_set) == 1:
             return True
         return False
 
@@ -93,23 +108,29 @@ class Cards():
         """ Checks if all cards are consecutive."""
         check_list = [self.scoring.get(card[0]) for card in self.cards]
         check_list.sort()
-        print(check_list)
 
         for i in range(1, 5):
             if check_list[0] != check_list[i]-i:
                 return False
         return True
 
-    def no_ranked_cards(self) -> bool:
+    def has_ranked_cards(self) -> bool:
         """ Method checks if card set has any ranked figures. If has, returns True."""
-        for i in self.values:
-            if self.cards_string.count(i) > 1:
-                return False
-        for i in self.colors:
-            if self.cards_string.count(i) > 2:
-                return False
 
-        return True
+        for i in self.values:
+            check = self.cards_string.count(i)
+            if check > 1:
+                return True
+
+        for i in self.colors:
+            check = self.cards_string.count(i)
+            if check >= 4:
+                return True
+
+        if self._consecutive_cards():
+            return True
+
+        return False
 
     def highest_card(self) -> dict:
         """ Method checks the highest card in card set."""
@@ -154,6 +175,18 @@ class Cards():
             return None
         return result
 
+    def score(self) -> dict:
+        """ Method returns highest score rank of the card set."""
+        if not self.has_ranked_cards():
+            return self.highest_card()
+
+        check = self.straight_flush()
+        if check != None:
+            return check
+        else:
+            return self.repeated_card_values()
+
+
 # -------------- TESTS ---------------
 
 
@@ -186,7 +219,7 @@ def test_Cards():
     card_set_3 = ['8C', '8S', 'TS', 'TC', 'TD']
     card_set_4 = ['QC', 'QS', 'QD', 'QH', 'AS']
     card_set_5 = ['2S', '5S', '7S', 'TS', 'QS']
-    card_set_6 = ['4C', '5S', '6S', '7C', '8D']
+    card_set_6 = ['4S', '5S', '6S', '7S', '8S']
     card_set_7 = ['QC', 'QS', 'QD', 'QH', 'AS']
 
     cards_1 = Cards(card_set_1)
@@ -198,32 +231,37 @@ def test_Cards():
     cards_7 = Cards(card_set_7)
 
     # then
-    assert cards_1.no_ranked_cards() == True
-    assert cards_2.no_ranked_cards() == False
+    assert cards_1.has_ranked_cards() == False
+    assert cards_2.has_ranked_cards() == True
     assert cards_1.highest_card() == {'K': 13}
     assert cards_1.repeated_card_values() == {}
     assert cards_2.repeated_card_values() == {'8': 2}
-    assert cards_3.repeated_card_values() == {'8': 2, 'T': 3}
+    assert cards_3.repeated_card_values() == {'8': 2, 'T': 3}  # Full House
     assert cards_4.repeated_card_values() == {'Q': 4}
     assert cards_5.straight_flush() == {'Flush': 12}
     assert cards_6.straight_flush() == {'Straight Flush': 8}
+    assert cards_6.score() == {'Straight Flush': 8}
+    assert cards_3.score() == {'8': 2, 'T': 3}
 
 
 def test_compare_cards():
     # given
-    plr1 = 12
-    plr2 = 44
+    plr1 = {'Flush': 12}
+    plr2 = {'8': 2, 'T': 3}
     # when
     result = compare_cards(plr1, plr2)
     # then
     assert result == 2
-    assert compare_cards(11, 32, 44, 21, 87) == 5
 
 
 # --------------- RUN ---------------
 if __name__ == '__main__':
     plr_1 = Cards(['4C', '5S', '6S', '7C', '8D'])
-    a = plr_1._consecutive_cards()
+    plr_2 = Cards(['QC', 'QS', 'QD', 'QH', 'AS'])
+
+    operator = PokerOperator(plr_1, plr_2)
+
+    a = plr_1.has_ranked_cards()
     print(a)
 
 # ------------ RESULT -------------
