@@ -32,18 +32,20 @@ class FileHandler():
     def __init__(self, file_path: str):
         self.file_path = file_path
 
-    def get_file_data() -> list:
+    def get_file_data(self) -> list:
         """ Generator function yields next list of cards in txt file row"""
-        file_path = './0054poker.txt'
-        with open(file_path, mode='r') as file:
+        with open(self.file_path, mode='r') as file:
             while True:
                 line = file.readline()
                 if len(line) == 0:
-                    raise StopIteration
+                    break
                 line_list = line[0:-1].split(' ')
-                yield line_list
 
-    def split_players(card_list: list) -> tuple:
+                split_players = self._split_players(line_list)
+
+                yield split_players
+
+    def _split_players(self, card_list: list) -> tuple:
         """ Returns cards split for players """
         cards_split = []
         no_cards_for_plr = int(len(card_list) / 2)
@@ -54,23 +56,25 @@ class FileHandler():
             ran_stop = ((i + 1) * no_cards_for_plr)
             plr = [i for i in card_list[ran_start:ran_stop]]
             cards_split.append(plr)
+
         return cards_split
 
 
 class PokerOperator():
     """Class works as operator for players and game."""
 
-    def __init__(self, player_1: Cards, player_2: Cards, *args):
-        self.player_1 = player_1
-        self.player_2 = player_2
-
-    def compare_cards(self, self.player_1, , *args) -> int:
+    @staticmethod
+    def compare_cards(cards: list) -> int:
         """ Compares card rankings of players. """
-        rankings = [i for i in (self.player_1, self.player_2, *args)]
-        winner = max(rankings)
-        winner_index = rankings.index(winner)
+        player_sets = [i for i in cards]
+        score_of_players = []
 
-        return winner_index+1
+        for i in player_sets:
+            plr_cards = Cards(i)
+            score = plr_cards.score()
+            score_of_players.append(score)
+
+        return score_of_players
 
 
 class Cards():
@@ -154,6 +158,8 @@ class Cards():
             if count > 1:
                 result.update({val: count})
 
+        # REVISE FOR RESULT IN FORM {'Pair/Triple/Four/3+2', scoring}
+
         return result
 
     def straight_flush(self) -> dict:
@@ -190,27 +196,29 @@ class Cards():
 # -------------- TESTS ---------------
 
 
-def test_get_file_data():
+def test_FileHandler():
     # given
-    iterator = get_file_data()
+    test_file_path = './0054poker.txt'
+    test_file_handler = FileHandler(test_file_path)
+
+    iterator = test_file_handler.get_file_data()
     # when
     first_row = next(iterator)
     # then
-    assert first_row == ['8C', 'TS', 'KC', '9H',
-                         '4S', '7D', '2S', '5D', '3S', 'AC']
-    assert next(iterator) == ['5C', 'AD', '5D', 'AC',
-                              '9C', '7C', '5H', '8D', 'TD', 'KS']
+    assert first_row == [['8C', 'TS', 'KC', '9H',
+                          '4S'], ['7D', '2S', '5D', '3S', 'AC']]
+    assert next(iterator) == [['5C', 'AD', '5D', 'AC',
+                               '9C'], ['7C', '5H', '8D', 'TD', 'KS']]
 
 
-def test_split_players():
+def test_PokerOperator():
     # given
-    card_list = ['8C', 'TS', 'KC', '9H',
-                 '4S', '7D', '2S', '5D', '3S', 'AC']
+    operator = PokerOperator()
+    compare = [['QC', 'QS', 'QD', 'QH', 'AS'], ['7D', '2S', '5D', '3S', 'AC']]
     # when
-    result = split_players(card_list)
+    result = operator.compare_cards(compare)
     # then
-    assert result == [['8C', 'TS', 'KC', '9H',
-                       '4S'], ['7D', '2S', '5D', '3S', 'AC']]
+    assert result == 1
 
 
 def test_Cards():
@@ -244,24 +252,12 @@ def test_Cards():
     assert cards_3.score() == {'8': 2, 'T': 3}
 
 
-def test_compare_cards():
-    # given
-    plr1 = {'Flush': 12}
-    plr2 = {'8': 2, 'T': 3}
-    # when
-    result = compare_cards(plr1, plr2)
-    # then
-    assert result == 2
-
-
 # --------------- RUN ---------------
 if __name__ == '__main__':
-    plr_1 = Cards(['4C', '5S', '6S', '7C', '8D'])
-    plr_2 = Cards(['QC', 'QS', 'QD', 'QH', 'AS'])
+    path = './0054poker.txt'
+    file = FileHandler(path)
 
-    operator = PokerOperator(plr_1, plr_2)
-
-    a = plr_1.has_ranked_cards()
-    print(a)
+    for i in file.get_file_data():
+        print(i)
 
 # ------------ RESULT -------------
