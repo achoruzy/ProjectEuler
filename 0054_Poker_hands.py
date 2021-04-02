@@ -64,17 +64,55 @@ class PokerOperator():
     """Class works as operator for players and game."""
 
     @staticmethod
-    def compare_cards(cards: list) -> int:
+    def compare_cards(scores: list, highest_cards: list) -> int:
         """ Compares card rankings of players. """
-        player_sets = [i for i in cards]
-        score_of_players = []
 
-        for i in player_sets:
-            plr_cards = Cards(i)
-            score = plr_cards.score()
-            score_of_players.append(score)
+        score_values = {
+            '2': 2,
+            '3': 3,
+            '4': 4,
+            '5': 5,
+            '6': 6,
+            '7': 7,
+            '8': 8,
+            '9': 9,
+            'T': 10,
+            'J': 11,
+            'Q': 12,
+            'K': 13,
+            'A': 14,
+            'Pair': 20,
+            'Two Pairs': 30,
+            'Triple': 40,
+            'Straight': 50,
+            'Flush': 60,
+            'Full House': 70,
+            'Four of a Kind': 80,
+            'Straight Flush': 90,
+        }
 
-        return score_of_players
+        score_list = []
+        score_highest = []
+
+        for player in scores:
+            score = list(player.keys())[0]
+            value = score_values.get(score)
+            score_list.append(value)
+
+        for i in score_list:
+            if score_list.index(i) > 1:
+                for player in highest_cards:
+                    highest = list(player.keys())[0]
+                    value = score_values.get(highest)
+                    score_highest.append(value)
+
+                    winner = score_list.index(max(score_list))+1
+
+                    return winner
+
+        winner = score_list.index(max(score_list))+1
+
+        return winner
 
 
 class Cards():
@@ -151,16 +189,56 @@ class Cards():
 
     def repeated_card_values(self) -> dict:
         """ Method checks if pairs, threes and fours of cards of one kind occurs in a set."""
+        help_result = dict()
         result = dict()
 
         for val in self.values:
             count = self.cards_string.count(val)
             if count > 1:
-                result.update({val: count})
+                help_result.update({val: count})
 
-        # REVISE FOR RESULT IN FORM {'Pair/Triple/Four/3+2', scoring}
+        if len(help_result) == 0:
+            return result
 
-        return result
+        dict_key = list(help_result.keys())
+        key_set = set(dict_key)
+        key = dict_key[0]
+        value = help_result.get(key)
+        score = self.scoring.get(key)
+
+        if len(help_result) > 1:
+            key_for_3 = ''
+            score_for_2 = 0
+
+            if key_set == (2, 2):
+                for key in dict_key:
+                    val = help_result.get(key)
+                    if val == 2:
+                        scr = self.scoring.get(val)
+                        if scr > score_for_2:
+                            score_for_2 = scr
+
+                result.update({'Two Pairs': score_for_2})
+                return result
+
+            else:
+                for key in dict_key:
+                    if help_result.get(key) == 3:
+                        key_for_3 = key
+
+                score_tri = self.scoring.get(key_for_3)
+                result.update({'Full House': score_tri})
+                return result
+
+        if value == 2:
+            result.update({'Pair': score})
+            return result
+        elif value == 3:
+            result.update({'Triple': score})
+            return result
+        elif value == 4:
+            result.update({'Four of a Kind': score})
+            return result
 
     def straight_flush(self) -> dict:
         """ Method checks Straight, Flush, Straight Flush and Royal Flush type figures for a card set."""
@@ -214,9 +292,10 @@ def test_FileHandler():
 def test_PokerOperator():
     # given
     operator = PokerOperator()
-    compare = [['QC', 'QS', 'QD', 'QH', 'AS'], ['7D', '2S', '5D', '3S', 'AC']]
+    compare = [{'Full House': 10}, {'K': 13}]
+    highest = [{'Q': 12}, {'K': 13}]
     # when
-    result = operator.compare_cards(compare)
+    result = operator.compare_cards(compare, highest)
     # then
     assert result == 1
 
@@ -229,6 +308,7 @@ def test_Cards():
     card_set_5 = ['2S', '5S', '7S', 'TS', 'QS']
     card_set_6 = ['4S', '5S', '6S', '7S', '8S']
     card_set_7 = ['QC', 'QS', 'QD', 'QH', 'AS']
+    card_set_8 = ['QC', 'QS', 'QD', 'KH', 'AS']
 
     cards_1 = Cards(card_set_1)
     cards_2 = Cards(card_set_2)
@@ -237,19 +317,21 @@ def test_Cards():
     cards_5 = Cards(card_set_5)
     cards_6 = Cards(card_set_6)
     cards_7 = Cards(card_set_7)
+    cards_8 = Cards(card_set_8)
 
     # then
     assert cards_1.has_ranked_cards() == False
     assert cards_2.has_ranked_cards() == True
     assert cards_1.highest_card() == {'K': 13}
     assert cards_1.repeated_card_values() == {}
-    assert cards_2.repeated_card_values() == {'8': 2}
-    assert cards_3.repeated_card_values() == {'8': 2, 'T': 3}  # Full House
-    assert cards_4.repeated_card_values() == {'Q': 4}
+    assert cards_2.repeated_card_values() == {'Pair': 8}
+    assert cards_3.repeated_card_values() == {'Full House': 10}
+    assert cards_4.repeated_card_values() == {'Four of a Kind': 12}
+    assert cards_8.repeated_card_values() == {'Triple': 12}
     assert cards_5.straight_flush() == {'Flush': 12}
     assert cards_6.straight_flush() == {'Straight Flush': 8}
     assert cards_6.score() == {'Straight Flush': 8}
-    assert cards_3.score() == {'8': 2, 'T': 3}
+    assert cards_3.score() == {'Full House': 10}
 
 
 # --------------- RUN ---------------
@@ -259,5 +341,15 @@ if __name__ == '__main__':
 
     for i in file.get_file_data():
         print(i)
+        player_1 = Cards(i[0])
+        player_2 = Cards(i[1])
+
+        scores = [player_1.score(), player_2.score()]
+        print(scores)
+        highest_cards = [player_1.highest_card(), player_2.highest_card()]
+
+        winner = PokerOperator.compare_cards(scores, highest_cards)
+
+        print(winner)
 
 # ------------ RESULT -------------
