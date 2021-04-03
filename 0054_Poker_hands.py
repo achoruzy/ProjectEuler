@@ -67,6 +67,8 @@ class PokerOperator():
     def compare_cards(scores: list, highest_cards: list) -> int:
         """ Compares card rankings of players. """
 
+        # Known issue: Cards comparission works only for highest cards in sets, so if in both sets are same cards
+
         score_values = {
             '2': 2,
             '3': 3,
@@ -94,24 +96,38 @@ class PokerOperator():
         score_list = []
         score_highest = []
 
+        # Scores are equal -> compare highest cards
+        if scores[0] == scores[1]:
+            for player in highest_cards:
+                key = list(player.keys())[0]
+                value = score_values.get(key)
+                score_highest.append(value)
+
+            if score_highest[0] == score_highest[1]:
+                raise Exception('Tie in first highest card check!')
+
+            winner = score_highest.index(max(score_highest))+1
+            return winner
+
+        # Scores are same type but different score highest card
+        plr1_key = list(scores[0].keys())[0]
+        plr2_key = list(scores[1].keys())[0]
+        if plr1_key == plr2_key:
+            if scores[0].get(plr1_key) > scores[1].get(plr2_key):
+                winner = 1
+            else:
+                winner = 2
+            return winner
+
+            # Else
         for player in scores:
             score = list(player.keys())[0]
             value = score_values.get(score)
             score_list.append(value)
 
-        for i in score_list:
-            if score_list.index(i) > 1:
-                for player in highest_cards:
-                    highest = list(player.keys())[0]
-                    value = score_values.get(highest)
-                    score_highest.append(value)
-
-                    winner = score_list.index(max(score_list))+1
-
-                    return winner
+        check_set = set(score_list)
 
         winner = score_list.index(max(score_list))+1
-
         return winner
 
 
@@ -166,7 +182,7 @@ class Cards():
 
         for i in self.colors:
             check = self.cards_string.count(i)
-            if check >= 4:
+            if check > 4:
                 return True
 
         if self._consecutive_cards():
@@ -188,7 +204,7 @@ class Cards():
         return highest_card
 
     def repeated_card_values(self) -> dict:
-        """ Method checks if pairs, threes and fours of cards of one kind occurs in a set."""
+        """ Method checks if pairs, threes and fours of cards of one kind occurs in a set. If no repeated cards found then returns highest card"""
         help_result = dict()
         result = dict()
 
@@ -198,10 +214,11 @@ class Cards():
                 help_result.update({val: count})
 
         if len(help_result) == 0:
-            return result
+            return self.highest_card()
 
         dict_key = list(help_result.keys())
-        key_set = set(dict_key)
+        dict_val = list(help_result.values())
+        val_set = set(dict_val)
         key = dict_key[0]
         value = help_result.get(key)
         score = self.scoring.get(key)
@@ -210,18 +227,18 @@ class Cards():
             key_for_3 = ''
             score_for_2 = 0
 
-            if key_set == (2, 2):
+            if val_set == {2}:
                 for key in dict_key:
                     val = help_result.get(key)
                     if val == 2:
-                        scr = self.scoring.get(val)
+                        scr = self.scoring.get(key)
                         if scr > score_for_2:
                             score_for_2 = scr
 
                 result.update({'Two Pairs': score_for_2})
                 return result
 
-            else:
+            elif val_set == {2, 3}:
                 for key in dict_key:
                     if help_result.get(key) == 3:
                         key_for_3 = key
@@ -298,6 +315,8 @@ def test_PokerOperator():
     result = operator.compare_cards(compare, highest)
     # then
     assert result == 1
+    assert operator.compare_cards(
+        [{'Full House': 10}, {'Full House': 10}], [{'Q': 12}, {'K': 13}]) == 2
 
 
 def test_Cards():
@@ -309,6 +328,8 @@ def test_Cards():
     card_set_6 = ['4S', '5S', '6S', '7S', '8S']
     card_set_7 = ['QC', 'QS', 'QD', 'QH', 'AS']
     card_set_8 = ['QC', 'QS', 'QD', 'KH', 'AS']
+    card_set_9 = ['3S', 'QH', '5S', '6S', 'AS']
+    card_set_10 = ['6D', '6C', 'TD', 'TH', 'KD']
 
     cards_1 = Cards(card_set_1)
     cards_2 = Cards(card_set_2)
@@ -318,12 +339,15 @@ def test_Cards():
     cards_6 = Cards(card_set_6)
     cards_7 = Cards(card_set_7)
     cards_8 = Cards(card_set_8)
+    cards_9 = Cards(card_set_9)
+    cards_10 = Cards(card_set_10)
 
     # then
     assert cards_1.has_ranked_cards() == False
     assert cards_2.has_ranked_cards() == True
+    assert cards_9.has_ranked_cards() == False
     assert cards_1.highest_card() == {'K': 13}
-    assert cards_1.repeated_card_values() == {}
+    assert cards_1.repeated_card_values() == {'K': 13}
     assert cards_2.repeated_card_values() == {'Pair': 8}
     assert cards_3.repeated_card_values() == {'Full House': 10}
     assert cards_4.repeated_card_values() == {'Four of a Kind': 12}
@@ -332,6 +356,8 @@ def test_Cards():
     assert cards_6.straight_flush() == {'Straight Flush': 8}
     assert cards_6.score() == {'Straight Flush': 8}
     assert cards_3.score() == {'Full House': 10}
+    assert cards_9.score() == {'A': 14}
+    assert cards_10.score() == {'Two Pairs': 10}
 
 
 # --------------- RUN ---------------
@@ -339,17 +365,32 @@ if __name__ == '__main__':
     path = './0054poker.txt'
     file = FileHandler(path)
 
+    plr1_wins = 0
+    plr2_wins = 0
+
     for i in file.get_file_data():
         print(i)
         player_1 = Cards(i[0])
         player_2 = Cards(i[1])
 
         scores = [player_1.score(), player_2.score()]
-        print(scores)
         highest_cards = [player_1.highest_card(), player_2.highest_card()]
 
         winner = PokerOperator.compare_cards(scores, highest_cards)
 
-        print(winner)
+        print(f'Player 1 score: {scores[0]}.',
+              f'Player 2 score: {scores[1]}.', f'\nWinner is player {winner}')
+
+        if winner == 1:
+            plr1_wins += 1
+        elif winner == 2:
+            plr2_wins += 1
+        else:
+            raise Exception('Something is wrong!')
+
+    print('Player 1 wins:', plr1_wins, '\nPlayer 2 wins:', plr2_wins)
 
 # ------------ RESULT -------------
+
+# Player 1 wins: 376
+# Player 2 wins: 624
