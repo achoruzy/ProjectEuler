@@ -58,6 +58,33 @@ def is_concatenate_to_prime(prime_1: int, prime_2: int) -> bool:
 
     return True
 
+
+def prime_list_conc(lenght: int, prime_num: int) -> list:
+    """Returns a list of primes that concatenate between them into another primes.
+    Returned list has size of input length.
+    prime_num is to assign with consecutive prime started from 3 (first) to start with"""
+    gen = prime_generator()
+
+    for i in range(prime_num):
+        next(gen)
+
+    first_prime = next(gen)
+    result_list = [first_prime]
+
+    while len(result_list) < lenght:
+        num = next(gen)
+        ok = True
+        for i in result_list:
+            if not is_concatenate_to_prime(num, i):
+                ok = False
+                break
+
+        if ok:
+            result_list.append(num)
+
+    return result_list
+
+
 # -------------- TESTS ---------------
 
 
@@ -88,11 +115,24 @@ def test_is_concatenate_to_prime():
     num2 = 673
     result = is_concatenate_to_prime(num1, num2)
     assert result == True
+    assert is_concatenate_to_prime(44, 22) == False
+
+
+def test_prime_list_conc():
+    assert prime_list_conc(lenght=2, prime_num=1) == [3, 7]
+    assert prime_list_conc(lenght=3, prime_num=1) == [3, 7, 109]
+    assert prime_list_conc(lenght=4, prime_num=1) == [3, 7, 109, 673]
 
 
 # --------------- RUN ---------------
 if __name__ == '__main__':
-    pass
+    first_prime = 8
+    how_many = 4
+
+    result = prime_list_conc(lenght=how_many, prime_num=first_prime)
+
+    print('Result list:', result)
+    print('Sum of result list = ', sum(result))
 
 
 # ------------ RESULT -------------
