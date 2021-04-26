@@ -18,20 +18,41 @@
 
 # -------------- CODE ----------------
 from math import sqrt
+from time import time
+import random
 
 
-def is_prime(num: int) -> bool:
+def timing(func, ):
+    """ Decorator function for calculating working time of another function."""
+    def wrapper(*args, **kwargs):
+        time_1 = time()
+        return_var = func(*args, **kwargs)
+        time_2 = time()
+        print('Function worked: ', str(time_2-time_1)[:5], ' sec.')
+        return return_var
+    return wrapper
+
+
+def is_prime(n: int) -> bool:
     """ Checks if num is prime number."""
-    if num in [0, 1]:
-        return False
-    if num in [2, 3, 5, 7]:
-        return True
-    if num % 2 == 0:
+    if n <= 3:
+        return n > 1
+
+    if n % 2 == 0 or n % 3 == 0:
         return False
 
-    for i in range(3, int(sqrt(num))+1, 2):
-        if num % i == 0:
+    i = 5
+    while i ** 2 <= n:
+        if n % i == 0 or n % (i + 2) == 0:
             return False
+        i += 6
+    return True
+
+    for i in range(8):  # number of trials
+        a = random.randrange(2, n)
+        if trial_composite(a):
+            return False
+
     return True
 
 
@@ -59,6 +80,7 @@ def is_concatenate_to_prime(prime_1: int, prime_2: int) -> bool:
     return True
 
 
+@timing
 def prime_list_conc(lenght: int, prime_num: int) -> list:
     """Returns a list of primes that concatenate between them into another primes.
     Returned list has size of input length.
@@ -126,13 +148,12 @@ def test_prime_list_conc():
 
 # --------------- RUN ---------------
 if __name__ == '__main__':
-    first_prime = 8
-    how_many = 4
 
-    result = prime_list_conc(lenght=how_many, prime_num=first_prime)
+    a_list = [4, 7, 8, 13]
 
-    print('Result list:', result)
-    print('Sum of result list = ', sum(result))
+    prime_list = prime_list_conc(4, 5)
+    print('List of primes:', prime_list, 'Sum:',
+          sum(prime_list))
 
 
 # ------------ RESULT -------------
