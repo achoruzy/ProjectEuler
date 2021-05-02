@@ -107,6 +107,71 @@ def prime_list_conc(lenght: int, prime_num: int) -> list:
     return result_list
 
 
+def is_list_concatenate(input_list: list) -> bool:
+    for p in input_list:
+        if input_list.count(p) > 1:
+            return False
+        for pp in input_list:
+            if p == pp:
+                continue
+            is_conc = is_concatenate_to_prime(p, pp)
+            if not is_conc:
+                return False
+    return True
+
+
+def concatenate_list(c_list: list) -> list:
+
+    # work_list = c_list.copy()
+
+    # lowest_sum = 10000000
+    # result_list = []
+
+    if len(c_list) < 3:
+        return []
+
+    p1 = c_list[0]
+    for p2 in c_list:
+        for p3 in c_list:
+            for p4 in c_list:
+                for p5 in c_list:
+
+                    test_list = [p1, p2, p3, p4, p5]
+
+                    concatenate = is_list_concatenate(test_list)
+
+                    if concatenate:
+                        sum_test = sum(test_list)
+                        return test_list
+
+    #                     if sum_test < lowest_sum:
+    #                         lowest_sum = sum_test
+    #                         result_list = test_list
+    #                         print(result_list)
+
+    # return result_list
+
+
+def concatenate_list_generator(limit_1: int, limit_2: int) -> list:
+    '''Generates a list of concatenate primes to the first one in the list'''
+    gen = prime_generator()
+    counter = 0
+
+    while counter < limit_1:
+        p = next(gen)
+        gen_2 = prime_generator()
+        help_list = []
+        help_list.append(p)
+        for pp in gen_2:
+            if pp > p:
+                if is_concatenate_to_prime(p, pp):
+                    help_list.append(pp)
+            if pp > limit_2:
+                break
+        counter = p
+        yield help_list
+
+
 # -------------- TESTS ---------------
 
 
@@ -138,6 +203,14 @@ def test_is_concatenate_to_prime():
     result = is_concatenate_to_prime(num1, num2)
     assert result == True
     assert is_concatenate_to_prime(44, 22) == False
+    assert is_concatenate_to_prime(3, 7) == True
+    assert is_concatenate_to_prime(7, 109) == True
+    assert is_concatenate_to_prime(7, 673) == True
+    assert is_concatenate_to_prime(3, 673) == True
+
+
+def test_is_list_concatenate():
+    assert is_list_concatenate([3, 7, 109, 673]) == True
 
 
 def test_prime_list_conc():
@@ -146,14 +219,25 @@ def test_prime_list_conc():
     assert prime_list_conc(lenght=4, prime_num=1) == [3, 7, 109, 673]
 
 
+def test_concatenate_list_generator():
+    gen = concatenate_list_generator(5, 19)
+    next(gen)
+    assert next(gen) == [3, 7, 11, 17]
+
+
 # --------------- RUN ---------------
 if __name__ == '__main__':
 
-    a_list = [4, 7, 8, 13]
+    # a_list = [4, 7, 8, 13]
 
-    prime_list = prime_list_conc(4, 5)
-    print('List of primes:', prime_list, 'Sum:',
-          sum(prime_list))
+    # prime_list = prime_list_conc(4, 5)
+    # print('List of primes:', prime_list, 'Sum:',
+    #       sum(prime_list))
 
+    for i in concatenate_list_generator(30, 10000):
+        concate = concatenate_list(i)
+
+        print('Concatenate prime list:', concate,
+              ' Sum of primes:', sum(concate))
 
 # ------------ RESULT -------------
