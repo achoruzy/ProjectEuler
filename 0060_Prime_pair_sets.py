@@ -109,8 +109,6 @@ def prime_list_conc(lenght: int, prime_num: int) -> list:
 
 def is_list_concatenate(input_list: list) -> bool:
     for p in input_list:
-        if input_list.count(p) > 1:
-            return False
         for pp in input_list:
             if p == pp:
                 continue
@@ -122,34 +120,41 @@ def is_list_concatenate(input_list: list) -> bool:
 
 def concatenate_list(c_list: list) -> list:
 
-    # work_list = c_list.copy()
-
-    # lowest_sum = 10000000
-    # result_list = []
-
     if len(c_list) < 3:
         return []
 
     p1 = c_list[0]
     for p2 in c_list:
         for p3 in c_list:
+            is_conc_23 = is_concatenate_to_prime(p2, p3)
+            if not is_conc_23:
+                continue
             for p4 in c_list:
+                is_conc_24 = is_concatenate_to_prime(p2, p4)
+                is_conc_34 = is_concatenate_to_prime(p3, p4)
+                if not is_conc_24 or not is_conc_34:
+                    continue
                 for p5 in c_list:
+                    is_conc_25 = is_concatenate_to_prime(p2, p5)
+                    is_conc_35 = is_concatenate_to_prime(p3, p5)
+                    is_conc_45 = is_concatenate_to_prime(p4, p5)
+                    if not is_conc_25 or not is_conc_35 or not is_conc_45:
+                        continue
 
                     test_list = [p1, p2, p3, p4, p5]
+                    ok = True
 
-                    concatenate = is_list_concatenate(test_list)
+                    for p in test_list:
+                        if test_list.count(p) > 1:
+                            ok = False
 
-                    if concatenate:
-                        sum_test = sum(test_list)
-                        return test_list
+                    if not ok:
+                        continue
 
-    #                     if sum_test < lowest_sum:
-    #                         lowest_sum = sum_test
-    #                         result_list = test_list
-    #                         print(result_list)
+                    sum_test = sum(test_list)
+                    return test_list
 
-    # return result_list
+    return []
 
 
 def concatenate_list_generator(limit_1: int, limit_2: int) -> list:
@@ -241,3 +246,5 @@ if __name__ == '__main__':
               ' Sum of primes:', sum(concate))
 
 # ------------ RESULT -------------
+
+# Concatenate prime list: [13, 5197, 5701, 6733, 8389]  Sum of primes: 26033
