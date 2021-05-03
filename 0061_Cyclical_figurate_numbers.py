@@ -44,7 +44,7 @@ def is_square(num: int) -> bool:
 
 
 def is_pentagonal(num: int) -> bool:
-    result = (-sqrt(1 + 24*num) - 1)/6
+    result = (sqrt(1 + 24*num) + 1)/6
 
     if result % int(result) == 0:
         return True
@@ -62,7 +62,7 @@ def is_hexagonal(num: int) -> bool:
 
 
 def is_heptagonal(num: int) -> bool:
-    result = 0
+    result = (3 + sqrt(9 + 40*num))/10
 
     if result % int(result) == 0:
         return True
@@ -71,12 +71,141 @@ def is_heptagonal(num: int) -> bool:
 
 
 def is_octogonal(num: int) -> bool:
-    result = (sqrt(4 + 6*num) + 3)/4
+    result = (sqrt(1 + 3*num) + 1)/3
 
     if result % int(result) == 0:
         return True
     else:
         return False
+
+
+def combine_num(half_1: int, half_2: int) -> int:
+    str_1 = str(half_1)
+    str_2 = str(half_2)
+    str_connected = str_1 + str_2
+    result_int = int(str_connected)
+
+    return result_int
+
+
+def is_cyclical(num: int, calculate=[True, True, True, True, True]) -> list:
+    result = []
+
+    is_tri = is_triangle(num)
+    is_sq = is_square(num)
+    is_pen = is_pentagonal(num)
+    is_hex = is_hexagonal(num)
+    is_hept = is_heptagonal(num)
+    is_octo = is_octogonal(num)
+
+    wip = [is_tri, is_sq, is_pen, is_hex, is_hept, is_octo]
+
+    for i in range(0, 6):
+        result.append(wip[i])
+
+    return result
+
+
+def compare_bool_list(list1: list, list2: list) -> list:
+    result = list1.copy()
+    for i in range(0, 5):
+        if list2[i]:
+            result[i] = False
+    return result
+
+
+def is_list_cyclical(list: list) -> bool:
+    pass
+
+
+def main() -> list:
+    result = []
+    for h1 in range(10, 100):
+
+        for h2 in range(10, 100):
+            num_1 = combine_num(h1, h2)
+            is_cycl = is_cyclical(num_1)
+
+            if True in is_cycl and h2 != h1:
+
+                for h3 in range(10, 100):
+                    num_2 = combine_num(h2, h3)
+                    is_cycl2 = is_cyclical(num_2)
+
+                    if True in is_cycl2 and h3 not in [h1, h2]:
+
+                        for h4 in range(10, 100):
+                            num_3 = combine_num(h3, h4)
+                            is_cycl3 = is_cyclical(num_3)
+
+                            if True in is_cycl3 and h4 not in [h1, h2, h3]:
+
+                                for h5 in range(10, 100):
+                                    num_4 = combine_num(h4, h5)
+                                    is_cycl4 = is_cyclical(num_4)
+
+                                    if True in is_cycl4 and h5 not in [h1, h2, h3, h4]:
+
+                                        for h6 in range(10, 100):
+                                            num_5 = combine_num(h5, h6)
+                                            is_cycl5 = is_cyclical(
+                                                num_5)
+
+                                            if True in is_cycl5 and h6 not in [h1, h2, h3, h4, h5]:
+
+                                                num_6 = combine_num(h6, h1)
+                                                is_cycl6 = is_cyclical(
+                                                    num_6)
+
+                                                if True in is_cycl6:
+
+                                                    result = [num_1, num_2, num_3,
+                                                              num_4, num_5, num_6]
+
+                                                    print(result, sum(result))
+                                                    print('')
+
+    result = []
+    for h1 in range(10, 100):
+
+        for h2 in range(10, 100):
+            num_1 = combine_num(h1, h2)
+            is_octo = is_triangle(num_1)
+
+            if is_octo:
+                for h3 in range(10, 100):
+                    num_2 = combine_num(h2, h3)
+                    is_cycl2 = is_cyclical(num_2)
+
+                    if True in is_cycl2:
+
+                        for h4 in range(10, 100):
+                            num_3 = combine_num(h3, h4)
+                            is_cycl3 = is_cyclical(num_3)
+
+                            if True in is_cycl3:
+
+                                for h5 in range(10, 100):
+                                    num_4 = combine_num(h4, h5)
+                                    is_cycl4 = is_cyclical(num_4)
+
+                                    if True in is_cycl4:
+
+                                        for h6 in range(10, 100):
+                                            num_5 = combine_num(h5, h6)
+                                            is_cycl5 = is_cyclical(
+                                                num_5)
+
+                                            num_6 = combine_num(h6, h1)
+                                            is_cycl6 = is_cyclical(
+                                                num_6)
+
+                                            if True in is_cycl5 and True in is_cycl6:
+
+                                                result = [num_1, num_2, num_3,
+                                                          num_4, num_5, num_6]
+                                                print(result, sum(result))
+
 
 # -------------- TESTS ---------------
 
@@ -130,6 +259,18 @@ def test_is_hexagonal():
     assert is_hexagonal(16) == False
 
 
+def test_is_heptagonal():
+    # given
+    num = 55
+    # when
+    result = is_heptagonal(num)
+    # then
+    assert result == True
+    assert type(result) == bool
+    assert is_heptagonal(34) == True
+    assert is_heptagonal(35) == False
+
+
 def test_is_octogonal():
     # given
     num = 8
@@ -142,9 +283,15 @@ def test_is_octogonal():
     assert is_octogonal(66) == False
 
 
+def test_combine_num():
+    half1 = 23
+    half2 = 87
+    assert combine_num(half1, half2) == 2387
+
+
 # --------------- RUN ---------------
 if __name__ == '__main__':
-    pass
+    main()
 
 
 # ------------ RESULT -------------
