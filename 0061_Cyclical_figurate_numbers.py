@@ -53,9 +53,9 @@ def is_pentagonal(num: int) -> bool:
 
 
 def is_hexagonal(num: int) -> bool:
-    result = (sqrt(1 + 8*num) + 1)/4
+    result = (sqrt((8*num) + 1) + 1)/4
 
-    if result % int(result) == 0:
+    if result - int(result) == 0:
         return True
     else:
         return False
@@ -114,8 +114,30 @@ def compare_bool_list(list1: list, list2: list) -> list:
     return result
 
 
-def is_list_cyclical(list: list) -> bool:
-    pass
+def is_list_cyclical(c_list: list) -> bool:
+    result = [0, 0, 0, 0, 0, 0]
+
+    for num in c_list:
+        is_tri = is_triangle(num)
+        is_sq = is_square(num)
+        is_pen = is_pentagonal(num)
+        is_hex = is_hexagonal(num)
+        is_hept = is_heptagonal(num)
+        is_octo = is_octogonal(num)
+
+        wip = [is_tri, is_sq, is_pen, is_hex, is_hept, is_octo]
+
+        for answ in wip:
+            if answ == True:
+                index = wip.index(answ)
+                result[index] += 1
+
+    if result[3] != 0:
+        print(result)
+    for i in result:
+        if i == 0:
+            return False
+    return True
 
 
 def main() -> list:
@@ -162,49 +184,88 @@ def main() -> list:
                                                     result = [num_1, num_2, num_3,
                                                               num_4, num_5, num_6]
 
-                                                    print(result, sum(result))
-                                                    print('')
+                                                    is_list_cyc = is_list_cyclical(
+                                                        result)
 
+                                                    if is_list_cyc:
+                                                        print(
+                                                            result, sum(result))
+                                                        print('')
+
+
+def main_hard() -> list:
     result = []
     for h1 in range(10, 100):
 
         for h2 in range(10, 100):
             num_1 = combine_num(h1, h2)
-            is_octo = is_triangle(num_1)
 
+            for h3 in range(10, 100):
+                num_2 = combine_num(h2, h3)
+
+                for h4 in range(10, 100):
+                    num_3 = combine_num(h3, h4)
+
+                    for h5 in range(10, 100):
+                        num_4 = combine_num(h4, h5)
+
+                        for h6 in range(10, 100):
+                            num_5 = combine_num(h5, h6)
+                            num_6 = combine_num(h6, h1)
+
+                            result = [num_1, num_2, num_3,
+                                      num_4, num_5, num_6]
+
+                            is_list_cyc = is_list_cyclical(
+                                result)
+
+                            if is_list_cyc:
+                                print(result, sum(result))
+                                print('')
+
+
+def main3():
+    for A in range(10, 100):
+        num_list = []
+        for B in range(10, 100):
+            num_AB = combine_num(A, B)
+            is_octo = is_octogonal(num_AB)
             if is_octo:
-                for h3 in range(10, 100):
-                    num_2 = combine_num(h2, h3)
-                    is_cycl2 = is_cyclical(num_2)
+                # BCD
+                num_BC = 0
+                num_CD = 0
+                for C in range(10, 100):
+                    num_BC = combine_num(B, C)
+                    is_cycl_BC = is_cyclical(num_BC)
+                    if True in is_cycl_BC:
+                        for D in range(10, 100):
+                            num_CD = combine_num(C, D)
+                            is_cycl_CD = is_cyclical(num_CD)
+                            if True in is_cycl_CD:
+                                # AFE
+                                for F in range(10, 100):
+                                    num_FA = combine_num(F, A)
+                                    is_cycl_FA = is_cyclical(num_FA)
+                                    if True in is_cycl_FA:
+                                        for E in range(10, 100):
+                                            num_EF = combine_num(E, F)
+                                            is_cycl_EF = is_cyclical(num_EF)
+                                            if True in is_cycl_EF:
+                                                num_DE = combine_num(D, E)
+                                                is_cycl_DE = is_cyclical(
+                                                    num_DE)
+                                                if True in is_cycl_DE:
 
-                    if True in is_cycl2:
-
-                        for h4 in range(10, 100):
-                            num_3 = combine_num(h3, h4)
-                            is_cycl3 = is_cyclical(num_3)
-
-                            if True in is_cycl3:
-
-                                for h5 in range(10, 100):
-                                    num_4 = combine_num(h4, h5)
-                                    is_cycl4 = is_cyclical(num_4)
-
-                                    if True in is_cycl4:
-
-                                        for h6 in range(10, 100):
-                                            num_5 = combine_num(h5, h6)
-                                            is_cycl5 = is_cyclical(
-                                                num_5)
-
-                                            num_6 = combine_num(h6, h1)
-                                            is_cycl6 = is_cyclical(
-                                                num_6)
-
-                                            if True in is_cycl5 and True in is_cycl6:
-
-                                                result = [num_1, num_2, num_3,
-                                                          num_4, num_5, num_6]
-                                                print(result, sum(result))
+                                                    num_list = [
+                                                        num_AB, num_BC,
+                                                        num_CD, num_DE, num_EF, num_FA]
+                                                    is_list_cyc = is_list_cyclical(
+                                                        num_list)
+                                                    if is_list_cyc:
+                                                        print(num_AB, num_BC,
+                                                              num_CD, num_DE, num_EF, num_FA)
+                                                        print(
+                                                            is_list_cyc, '\n')
 
 
 # -------------- TESTS ---------------
@@ -257,6 +318,7 @@ def test_is_hexagonal():
     assert type(result) == bool
     assert is_hexagonal(15) == True
     assert is_hexagonal(16) == False
+    assert is_hexagonal(946) == True
 
 
 def test_is_heptagonal():
@@ -291,7 +353,7 @@ def test_combine_num():
 
 # --------------- RUN ---------------
 if __name__ == '__main__':
-    main()
+    main3()
 
 
 # ------------ RESULT -------------
