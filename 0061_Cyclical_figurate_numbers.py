@@ -139,8 +139,6 @@ def is_list_cyclical(c_list: list) -> bool:
             return False
     return True
 
-
-def main() -> list:
     result = []
     for h1 in range(10, 100):
 
@@ -193,79 +191,127 @@ def main() -> list:
                                                         print('')
 
 
-def main_hard() -> list:
-    result = []
-    for h1 in range(10, 100):
-
-        for h2 in range(10, 100):
-            num_1 = combine_num(h1, h2)
-
-            for h3 in range(10, 100):
-                num_2 = combine_num(h2, h3)
-
-                for h4 in range(10, 100):
-                    num_3 = combine_num(h3, h4)
-
-                    for h5 in range(10, 100):
-                        num_4 = combine_num(h4, h5)
-
-                        for h6 in range(10, 100):
-                            num_5 = combine_num(h5, h6)
-                            num_6 = combine_num(h6, h1)
-
-                            result = [num_1, num_2, num_3,
-                                      num_4, num_5, num_6]
-
-                            is_list_cyc = is_list_cyclical(
-                                result)
-
-                            if is_list_cyc:
-                                print(result, sum(result))
-                                print('')
+def triangle_gen(start: int, stop: int) -> int:
+    num = 1
+    result = 0
+    while result <= stop:
+        result = int((num * num + num) / 2)
+        if stop >= result >= start:
+            yield result
+        num += 1
 
 
-def main3():
-    for A in range(10, 100):
-        num_list = []
-        for B in range(10, 100):
-            num_AB = combine_num(A, B)
-            is_octo = is_octogonal(num_AB)
-            if is_octo:
-                # BCD
-                num_BC = 0
-                num_CD = 0
-                for C in range(10, 100):
-                    num_BC = combine_num(B, C)
-                    is_cycl_BC = is_cyclical(num_BC)
-                    if True in is_cycl_BC:
-                        for D in range(10, 100):
-                            num_CD = combine_num(C, D)
-                            is_cycl_CD = is_cyclical(num_CD)
-                            if True in is_cycl_CD:
-                                # AFE
-                                for F in range(10, 100):
-                                    num_FA = combine_num(F, A)
-                                    is_cycl_FA = is_cyclical(num_FA)
-                                    if True in is_cycl_FA:
-                                        for E in range(10, 100):
-                                            num_EF = combine_num(E, F)
-                                            is_cycl_EF = is_cyclical(num_EF)
-                                            if True in is_cycl_EF:
-                                                num_DE = combine_num(D, E)
-                                                is_cycl_DE = is_cyclical(
-                                                    num_DE)
-                                                if True in is_cycl_DE:
+def square_gen(start: int, stop: int) -> int:
+    num = 1
+    result = 0
+    while result <= stop:
+        result = num * num
+        if stop >= result >= start:
+            yield result
+        num += 1
 
-                                                    num_list = [
-                                                        num_AB, num_BC,
-                                                        num_CD, num_DE, num_EF, num_FA]
-                                                    is_list_cyc = is_list_cyclical(
-                                                        num_list)
-                                                    if is_list_cyc:
-                                                        print(num_AB, num_BC,
-                                                              num_CD, num_DE, num_EF, num_FA)
-                                                        print(
-                                                            is_list_cyc, '\n')
+
+def pentagonal_gen(start: int, stop: int) -> int:
+    num = 1
+    result = 0
+    while result <= stop:
+        result = int((3 * num * num - num) / 2)
+        if stop >= result >= start:
+            yield result
+        num += 1
+
+
+def hexagonal_gen(start: int, stop: int) -> int:
+    num = 1
+    result = 0
+    while result <= stop:
+        result = 2 * num * num + num
+        if stop >= result >= start:
+            yield result
+        num += 1
+
+
+def heptagonal_gen(start: int, stop: int) -> int:
+    num = 1
+    result = 0
+    while result <= stop:
+        result = int((5 * num * num - 3 * num) / 2)
+        if stop >= result >= start:
+            yield result
+        num += 1
+
+
+def octagonal_gen(start: int, stop: int) -> int:
+    num = 1
+    result = 0
+    while result <= stop:
+        result = 3 * num * num - 2 * num
+        if stop >= result >= start:
+            yield result
+        num += 1
+
+
+def check_next(num1: int, num2: int) -> bool:
+    num1_endstr = str(num1)[2:]
+    num2_startstr = str(num2)[:2]
+    if num1_endstr == num2_startstr:
+        return True
+    return False
+
+
+def main():
+    start = 1011
+    end = 9998
+
+    tri_list = [i for i in triangle_gen(start, end)]
+    squ_list = [i for i in square_gen(start, end)]
+    pen_list = [i for i in pentagonal_gen(start, end)]
+    hex_list = [i for i in hexagonal_gen(start, end)]
+    hep_list = [i for i in heptagonal_gen(start, end)]
+    octo_list = [i for i in octagonal_gen(start, end)]
+
+    all_list = []
+    all_list.extend(tri_list)
+    all_list.extend(squ_list)
+    all_list.extend(pen_list)
+    all_list.extend(hex_list)
+    all_list.extend(hep_list)
+    all_list.extend(octo_list)
+
+    for num in all_list:
+        second = []
+
+        for num2 in all_list:
+            if check_next(num, num2):
+                second.append(num2)
+
+            third = []
+            for num3 in second:
+                if check_next(num2, num3):
+                    third.append(num3)
+
+                fourth = []
+                for num4 in third:
+                    if check_next(num3, num4):
+                        fourth.append(num4)
+
+                    fifth = []
+                    for num5 in fourth:
+                        if check_next(num4, num5):
+                            fifth.append(num5)
+
+                        for num6 in fifth:
+                            if check_next(num5, num6):
+                                # print('                 ', num6)
+                                check_list = [num, num2,
+                                              num3, num4, num5, num6]
+                                brejk = False
+                                for i in check_list:
+                                    if check_list.count(i) > 1:
+                                        brejk = True
+                                if not brejk:
+                                    print(num, num2, num3, num4,
+                                          num5, num6, '\n')
 
 
 # -------------- TESTS ---------------
@@ -353,7 +399,7 @@ def test_combine_num():
 
 # --------------- RUN ---------------
 if __name__ == '__main__':
-    main3()
+    main()
 
 
 # ------------ RESULT -------------
