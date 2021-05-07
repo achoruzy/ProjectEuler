@@ -195,7 +195,7 @@ def triangle_gen(start: int, stop: int) -> int:
     num = 1
     result = 0
     while result <= stop:
-        result = int((num * num + num) / 2)
+        result = (num * (num + 1)) // 2
         if stop >= result >= start:
             yield result
         num += 1
@@ -215,7 +215,7 @@ def pentagonal_gen(start: int, stop: int) -> int:
     num = 1
     result = 0
     while result <= stop:
-        result = int((3 * num * num - num) / 2)
+        result = (num * (3 * num - 1)) // 2
         if stop >= result >= start:
             yield result
         num += 1
@@ -225,7 +225,7 @@ def hexagonal_gen(start: int, stop: int) -> int:
     num = 1
     result = 0
     while result <= stop:
-        result = 2 * num * num + num
+        result = num * (2 * num + 1)
         if stop >= result >= start:
             yield result
         num += 1
@@ -235,7 +235,7 @@ def heptagonal_gen(start: int, stop: int) -> int:
     num = 1
     result = 0
     while result <= stop:
-        result = int((5 * num * num - 3 * num) / 2)
+        result = (num * (5 * num - 3)) // 2
         if stop >= result >= start:
             yield result
         num += 1
@@ -245,23 +245,22 @@ def octagonal_gen(start: int, stop: int) -> int:
     num = 1
     result = 0
     while result <= stop:
-        result = 3 * num * num - 2 * num
+        result = num * (3 * num - 2)
         if stop >= result >= start:
             yield result
         num += 1
 
 
-def check_next(num1: int, num2: int) -> bool:
-    num1_endstr = str(num1)[2:]
+def is_next(num1: int, num2: int) -> bool:
+    num1_endstr = str(num1)[-2:]
     num2_startstr = str(num2)[:2]
-    if num1_endstr == num2_startstr:
-        return True
-    return False
+
+    return num1_endstr == num2_startstr
 
 
 def main():
-    start = 1011
-    end = 9998
+    start = 1000
+    end = 9999
 
     tri_list = [i for i in triangle_gen(start, end)]
     squ_list = [i for i in square_gen(start, end)]
@@ -270,49 +269,61 @@ def main():
     hep_list = [i for i in heptagonal_gen(start, end)]
     octo_list = [i for i in octagonal_gen(start, end)]
 
-    all_list = []
-    all_list.extend(tri_list)
-    all_list.extend(squ_list)
-    all_list.extend(pen_list)
-    all_list.extend(hex_list)
-    all_list.extend(hep_list)
-    all_list.extend(octo_list)
+    all_list = {
+        3: [n for n in tri_list],
+        4: [n for n in squ_list],
+        5: [n for n in pen_list],
+        6: [n for n in hex_list],
+        7: [n for n in hep_list],
+        8: [n for n in octo_list]
+    }
 
-    for num in all_list:
-        second = []
+    nums = []
+    all_list_help = all_list.copy()
+    for k in all_list:
+        for n in all_list[k]:
 
-        for num2 in all_list:
-            if check_next(num, num2):
-                second.append(num2)
+            all_list_2 = all_list.copy()
+            all_list_2.pop(k)
+            for k2 in all_list_2:
+                for n2 in all_list[k2]:
 
-            third = []
-            for num3 in second:
-                if check_next(num2, num3):
-                    third.append(num3)
+                    if is_next(n, n2):
 
-                fourth = []
-                for num4 in third:
-                    if check_next(num3, num4):
-                        fourth.append(num4)
+                        all_list_3 = all_list_2.copy()
+                        all_list_3.pop(k2)
+                        for k3 in all_list_3:
+                            for n3 in all_list[k3]:
 
-                    fifth = []
-                    for num5 in fourth:
-                        if check_next(num4, num5):
-                            fifth.append(num5)
+                                if is_next(n2, n3):
 
-                        for num6 in fifth:
-                            if check_next(num5, num6):
-                                # print('                 ', num6)
-                                check_list = [num, num2,
-                                              num3, num4, num5, num6]
-                                brejk = False
-                                for i in check_list:
-                                    if check_list.count(i) > 1:
-                                        brejk = True
-                                if not brejk:
-                                    print(num, num2, num3, num4,
-                                          num5, num6, '\n')
+                                    all_list_4 = all_list_3.copy()
+                                    all_list_4.pop(k3)
+                                    for k4 in all_list_4:
+                                        for n4 in all_list[k4]:
 
+                                            if is_next(n3, n4):
+
+                                                all_list_5 = all_list_4.copy()
+                                                all_list_5.pop(k4)
+                                                for k5 in all_list_5:
+                                                    for n5 in all_list[k5]:
+
+                                                        if is_next(n4, n5):
+
+                                                            all_list_6 = all_list_5.copy()
+                                                            all_list_6.pop(k5)
+                                                            for k6 in all_list_6:
+                                                                for n6 in all_list[k6]:
+
+                                                                    if is_next(n5, n6) and is_next(n6, n):
+                                                                        print(
+                                                                            n, n2, n3, n4, n5, n6)
+                                                                        print(
+                                                                            k, k2, k3, k4, k5, k6)
+                                                                        print(
+                                                                            'sum =', n+n2+n3+n4+n5+n6)
+                                                                        return
 
 # -------------- TESTS ---------------
 
@@ -403,3 +414,7 @@ if __name__ == '__main__':
 
 
 # ------------ RESULT -------------
+
+# 8128 2882 8256 5625 2512 1281
+# 3 5 6 4 7 8
+# sum = 28684
