@@ -27,9 +27,9 @@ def timing(func):
 
 
 def find(A: list) -> int:
-    A_set = {n for n in A if n > 0}
+    A_set = set(A)  # {n for n in A if n > 0}
 
-    for i in range(1, len(A)):
+    for i in range(1, len(A_set)):
         if i not in A_set:
             return i
 
@@ -44,6 +44,16 @@ def solution(A: list) -> int:
     return find(A)
 
 
+@timing
+def solution_3(A):
+
+    max_elem = max(A)
+    if max_elem <= 0:
+        return 1
+    else:
+        return min(set(range(1, max_elem+2)) - set(A))
+
+
 # --------------- RUN ---------------
 if __name__ == '__main__':
     A = [1, 3, 6, 4, 1, 2, 10, 11, 34, 2, 5, 6,
@@ -52,12 +62,13 @@ if __name__ == '__main__':
     C = [876456, 267834]
     D = [i for i in range(1, 10000)]
     D.remove(9997)
-    E = [i for i in range(1, 100000)]
-    E.remove(99997)
+    E = [i for i in range(-1000, 1000000)]
+    E.remove(999997)
     print(solution(A))
     print(solution(B))
     print(solution(C))
     print(solution(D))
     print(solution(E))
+    print(solution_3(E))
 
 # ------------ RESULT -------------
