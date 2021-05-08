@@ -46,10 +46,18 @@ def solution(A: list) -> int:
 
 # --------------- RUN ---------------
 if __name__ == '__main__':
-    A = [1, 3, 6, 4, 1, 2]
+    A = [1, 3, 6, 4, 1, 2, 10, 11, 34, 2, 5, 6,
+         7, 8, 9, 22, 12, 13, 14, 15, 16, 17, 18]
     B = [-1, -3]
+    C = [876456, 267834]
+    D = [i for i in range(1, 10000)]
+    D.remove(9997)
+    E = [i for i in range(1, 100000)]
+    E.remove(99997)
     print(solution(A))
     print(solution(B))
-
+    print(solution(C))
+    print(solution(D))
+    print(solution(E))
 
 # ------------ RESULT -------------
