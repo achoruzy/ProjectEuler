@@ -40,23 +40,50 @@ def cube_generator(lenght: int) -> list:
 
 
 def compare_for_permutations(cubes: list, permuts: int) -> list:
-    '''Checks for number of permutations along list'''
+    '''Checks for number of permutations along list
+    
+    params:
+        cubes: list -> list of cubes of equal lenght
+        permuts: int -> how many permutations to be found
+
+    returns:
+        list of found permutations if len(result) == permuts
+        empty list if else
+    '''
     result = []
+
     for i in cubes:
-        i_sorted_str = str(i)
-        for j in cubes.remove(i):
-            j_sorted_str = str(i)
-            if i_sorted_str == j_sorted_str:
-                if len(result) == 0:
-                    result.append(i)
-                result.append(j)
-    return result
+        result_iter = []
+        i_str = str(i)
+
+        cubes_iter = cubes
+        cubes_iter.remove(i)
+        for j in cubes_iter:
+            j_str = str(j)
+            if sorted(i_str) == sorted(j_str):
+                if len(result_iter) == 0:
+                    result_iter.append(i)
+                result_iter.append(j)
+        
+        if len(result_iter) == permuts:
+            result.append(result_iter)
+
+    for i in result:
+        if len(i) == permuts:
+            return i
+    return []
+
 
 def main():
-    iter = 4
+    iter = 3
     while True:
         cubes = cube_generator(iter)
-        print(cubes)
+        permuts = 5
+        list_permuts = compare_for_permutations(cubes, permuts)
+        
+        if len(list_permuts) == permuts:
+            return list_permuts
+
         if iter == 25:
             break
         iter += 1
@@ -73,9 +100,22 @@ def test_cube_generator():
     assert result == [125, 216, 343, 512, 729]
 
 
+def test_compare_for_permutations():
+    test_list_1 = [125, 216, 343, 512, 729]
+    test_param_1 = 5
+    assert compare_for_permutations(test_list_1, test_param_1) == []
+
+    test_list_2 = [8766, 1234, 2341, 3421, 2431, 9090]
+    test_param_2 = 4
+    assert compare_for_permutations(test_list_1, test_param_2) == [1234, 2341, 3421, 2431]
+
 # --------------- RUN ---------------
 if __name__ == '__main__':
-    main()
+    result_list = main()
+    print(result_list)
+    print(min(result_list))
+    print(result_list[0]**(1./3))
 
 
 # ------------ RESULT -------------
+# 140283769536
