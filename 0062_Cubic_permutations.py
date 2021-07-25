@@ -25,66 +25,74 @@ def timing(func):
 
 
 def cube_generator(lenght: int) -> list:
-    '''Generates lists of cubes <x^3> of specified number of digits'''
-    iter = 1
+    '''Generates lists of cubes <x^3> of specified number of digits
+    
+    params:
+        lenght: int -> number of digits for cubes
+
+    returns:
+        list of cubes of specified number of digits
+    '''
     result = []
+    
+    iter = 1
     while True:
         cube = iter ** 3
-        if len(str(cube)) == lenght:
+        cube_str_len = len(str(cube))
+        if cube_str_len == lenght:
             result.append(cube)
-        elif len(str(cube)) > lenght:
+        elif cube_str_len > lenght:
             break
         iter += 1
-
+    
     return result
 
 
-def compare_for_permutations(cubes: list, permuts: int) -> list:
+def compare_for_smallest_permutations(cubes: list, permuts: int) -> list:
     '''Checks for number of permutations along list
     
     params:
         cubes: list -> list of cubes of equal lenght
-        permuts: int -> how many permutations to be found
+        permuts: int -> how many permutations has to be found
 
     returns:
         list of found permutations if len(result) == permuts
         empty list if else
     '''
-    result = []
-
     for i in cubes:
-        result_iter = []
+        result_for_iter = []
         i_str = str(i)
 
-        cubes_iter = cubes
-        cubes_iter.remove(i)
-        for j in cubes_iter:
-            j_str = str(j)
-            if sorted(i_str) == sorted(j_str):
-                if len(result_iter) == 0:
-                    result_iter.append(i)
-                result_iter.append(j)
-        
-        if len(result_iter) == permuts:
-            result.append(result_iter)
+        cubes_in_iter = cubes.copy()
+        cubes_in_iter.remove(i)
 
-    for i in result:
-        if len(i) == permuts:
-            return i
+        for j in cubes_in_iter:
+            j_str = str(j)
+
+            if sorted(i_str) == sorted(j_str):
+
+                if len(result_for_iter) == 0:
+                    result_for_iter.append(i)
+                
+                result_for_iter.append(j)
+        
+        if len(result_for_iter) == permuts:
+            # First found -> smallest
+            return result_for_iter
+
     return []
 
 
-def main():
-    iter = 3
+def main(permuts: int) -> int:
+    iter = 11
     while True:
         cubes = cube_generator(iter)
-        permuts = 5
-        list_permuts = compare_for_permutations(cubes, permuts)
+        list_permuts = compare_for_smallest_permutations(cubes, permuts)
         
         if len(list_permuts) == permuts:
             return list_permuts
 
-        if iter == 25:
+        if iter == 13:
             break
         iter += 1
 
@@ -100,22 +108,22 @@ def test_cube_generator():
     assert result == [125, 216, 343, 512, 729]
 
 
-def test_compare_for_permutations():
+def test_compare_for_smallest_permutations():
     test_list_1 = [125, 216, 343, 512, 729]
     test_param_1 = 5
-    assert compare_for_permutations(test_list_1, test_param_1) == []
+    assert compare_for_smallest_permutations(test_list_1, test_param_1) == []
 
     test_list_2 = [8766, 1234, 2341, 3421, 2431, 9090]
     test_param_2 = 4
-    assert compare_for_permutations(test_list_1, test_param_2) == [1234, 2341, 3421, 2431]
+    assert compare_for_smallest_permutations(test_list_2, test_param_2).sort() == [1234, 2341, 3421, 2431].sort()
 
 # --------------- RUN ---------------
 if __name__ == '__main__':
-    result_list = main()
+    result_list = main(5)
     print(result_list)
     print(min(result_list))
-    print(result_list[0]**(1./3))
+    print(round(result_list[0]**(1./3)))
 
 
 # ------------ RESULT -------------
-# 140283769536
+# 127035954683
