@@ -33,6 +33,11 @@ def closest_square(num: int) -> int:
     return closest_square
 
 
+def continuated_fraction(sqrt: int, closest_sq: int) -> float:
+    result = 0
+    return result
+
+
 # -------------- TESTS ---------------
 
 def test_closest_square():
@@ -44,6 +49,10 @@ def test_closest_square():
     assert 1 == closest_square(3)
     assert 2 == closest_square(5)
     assert 10 == closest_square(108)
+
+
+def test_continuated_fraction():
+    assert 2 == continuated_fraction(2, 1)
 
 
 # --------------- RUN ---------------
