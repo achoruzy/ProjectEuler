@@ -5,7 +5,11 @@
 
 # ----------- PSEUDOCODE -------------
 
-#
+# get next number A for square root
+# check what is closest ideal square root SQR for number A
+# make number in form SQR + SQRT(A) - SQR
+# append SQR to the list of check digits
+# check if fractions in list are repeatable -> if yes and if odd number of then +1 to result
 
 # -------------- CODE ----------------
 from time import time
@@ -22,13 +26,24 @@ def timing(func):
     return wrapper()
 
 
+def closest_square(num: int) -> int:
+    """Finds closest lower ideal square.
+    """
+    closest_square = int(num**0.5)
+    return closest_square
+
+
 # -------------- TESTS ---------------
 
-def test_():
+def test_closest_square():
     # given
     # when
     # then
-    pass
+    assert 1 == closest_square(1)
+    assert 1 == closest_square(2)
+    assert 1 == closest_square(3)
+    assert 2 == closest_square(5)
+    assert 10 == closest_square(108)
 
 
 # --------------- RUN ---------------
