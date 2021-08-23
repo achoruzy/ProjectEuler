@@ -26,33 +26,34 @@ def timing(func):
     return wrapper()
 
 
-def closest_square(num: int) -> int:
-    """Finds closest lower ideal square.
+def total_part(num: float or int) -> int:
+    """Finds total part of irrational number.
     """
     closest_square = int(num**0.5)
     return closest_square
 
 
-def continuated_fraction(sqrt: int, closest_sq: int) -> float:
-    result = 0
-    return result
+def irrational_num_rest(irrational_prt: int, total_prt: int) -> float:
+    result = 1 / (irrational_prt**0.5 - total_prt)
+    return int(result)
 
 
 # -------------- TESTS ---------------
 
-def test_closest_square():
+def test_total_part():
     # given
     # when
     # then
-    assert 1 == closest_square(1)
-    assert 1 == closest_square(2)
-    assert 1 == closest_square(3)
-    assert 2 == closest_square(5)
-    assert 10 == closest_square(108)
+    assert 1 == total_part(1)
+    assert 1 == total_part(2)
+    assert 1 == total_part(3)
+    assert 2 == total_part(5)
+    assert 10 == total_part(108)
 
 
-def test_continuated_fraction():
-    assert 2 == continuated_fraction(2, 1)
+def test_irrational_num_rest():
+    assert 2 == irrational_num_rest(2, 1)
+    assert 1 == irrational_num_rest(23, 4)
 
 
 # --------------- RUN ---------------
