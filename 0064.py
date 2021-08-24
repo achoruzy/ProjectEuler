@@ -34,12 +34,31 @@ def total_part(num: float or int) -> int:
 
 
 def irrational_num_rest(irr_prt: int, tot_prt: int) -> float:
+    """Finds irrational (fraction) part of irrational number.
+    """
     #result = 1 / (irr_prt**0.5 - tot_prt)
     result = (irr_prt**0.5 + tot_prt)/(irr_prt - tot_prt**2)
     return int(result)
 
 
+def continued_fraction(num: int, lenght: int) -> list:
+    result_list = []
+
+    total = total_part(num)
+    irrational = num
+
+    result_list.append(total)
+
+    while len(result_list) < lenght:
+        irrational = irrational_num_rest(irrational, total)
+        total = total_part(irrational)
+
+        result_list.append(irrational)
+
+    return result_list
+
 # -------------- TESTS ---------------
+
 
 def test_total_part():
     # given
@@ -57,9 +76,14 @@ def test_irrational_num_rest():
     assert 1 == irrational_num_rest(23, 4)
 
 
+def test_continued_fraction():
+    assert [1, 2, 2, 2] == continued_fraction(2, 4)
+    assert [3, 1, 1, 1, 1, 6] == continued_fraction(13, 6)
+
+
 # --------------- RUN ---------------
 if __name__ == '__main__':
-    pass
+    print(continued_fraction(13, 6))
 
 
 # ------------ RESULT -------------
