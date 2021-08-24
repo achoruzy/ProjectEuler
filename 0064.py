@@ -33,8 +33,9 @@ def total_part(num: float or int) -> int:
     return closest_square
 
 
-def irrational_num_rest(irrational_prt: int, total_prt: int) -> float:
-    result = 1 / (irrational_prt**0.5 - total_prt)
+def irrational_num_rest(irr_prt: int, tot_prt: int) -> float:
+    #result = 1 / (irr_prt**0.5 - tot_prt)
+    result = (irr_prt**0.5 + tot_prt)/(irr_prt - tot_prt**2)
     return int(result)
 
 
