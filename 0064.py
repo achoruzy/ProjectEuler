@@ -38,22 +38,20 @@ def irrational_num_rest(irr_prt: int, tot_prt: int) -> float:
     """
     #result = 1 / (irr_prt**0.5 - tot_prt)
     result = (irr_prt**0.5 + tot_prt)/(irr_prt - tot_prt**2)
-    return int(result)
+    return result
 
 
 def continued_fraction(num: int, lenght: int) -> list:
     result_list = []
 
-    total = total_part(num)
     irrational = num
 
-    result_list.append(total)
-
     while len(result_list) < lenght:
-        irrational = irrational_num_rest(irrational, total)
         total = total_part(irrational)
+        irrational = irrational**0.5 - total
+        rest = irrational_num_rest(irrational, total)
 
-        result_list.append(irrational)
+        result_list.append(total)
 
     return result_list
 
