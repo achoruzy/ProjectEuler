@@ -44,14 +44,16 @@ def irrational_num_rest(irr_prt: int, tot_prt: int) -> float:
 def continued_fraction(num: int, lenght: int) -> list:
     result_list = []
 
-    irrational = num
+    sqrt = num**0.5
+    total = total_part(num)
+    result_list.append(total)
+    irrational = sqrt - total
 
     while len(result_list) < lenght:
         total = total_part(irrational)
-        irrational = irrational**0.5 - total
-        rest = irrational_num_rest(irrational, total)
-
         result_list.append(total)
+
+        irrational = sqrt - total
 
     return result_list
 
@@ -81,7 +83,7 @@ def test_continued_fraction():
 
 # --------------- RUN ---------------
 if __name__ == '__main__':
-    print(continued_fraction(13, 6))
+    print(continued_fraction(2, 5))
 
 
 # ------------ RESULT -------------
