@@ -13,6 +13,7 @@
 
 # -------------- CODE ----------------
 from time import time
+from math import sqrt
 
 
 def timing(func):
@@ -29,31 +30,36 @@ def timing(func):
 def total_part(num: float or int) -> int:
     """Finds total part of irrational number.
     """
-    closest_square = int(num**0.5)
+    closest_square = int(sqrt(num))
     return closest_square
 
 
-def irrational_num_rest(irr_prt: int, tot_prt: int) -> float:
+def one_divide_by_irrational(irr_prt: int, tot_prt: int) -> float:
     """Finds irrational (fraction) part of irrational number.
     """
-    #result = 1 / (irr_prt**0.5 - tot_prt)
-    result = (irr_prt**0.5 + tot_prt)/(irr_prt - tot_prt**2)
-    return result
+    result = (sqrt(irr_prt) + tot_prt)/(irr_prt - tot_prt**2)
+    return abs(result)
 
 
 def continued_fraction(num: int, lenght: int) -> list:
     result_list = []
 
-    sqrt = num**0.5
+    sqr = sqrt(num)
+
     total = total_part(num)
     result_list.append(total)
-    irrational = sqrt - total
+
+    irrational = sqr - total
 
     while len(result_list) < lenght:
-        total = total_part(irrational)
-        result_list.append(total)
 
-        irrational = sqrt - total
+        irrational_under_one = one_divide_by_irrational(irrational, total)
+
+        total = total_part(irrational_under_one)  # tu jest blad
+        result_list.append(total)
+        print(total, irrational_under_one)
+
+        irrational = irrational_under_one - total
 
     return result_list
 
@@ -71,19 +77,17 @@ def test_total_part():
     assert 10 == total_part(108)
 
 
-def test_irrational_num_rest():
-    assert 2 == irrational_num_rest(2, 1)
-    assert 1 == irrational_num_rest(23, 4)
+def test_one_divide_by_irrational():
+    pass
 
 
 def test_continued_fraction():
-    assert [1, 2, 2, 2] == continued_fraction(2, 4)
-    assert [3, 1, 1, 1, 1, 6] == continued_fraction(13, 6)
+    pass
 
 
 # --------------- RUN ---------------
 if __name__ == '__main__':
-    print(continued_fraction(2, 5))
+    print(continued_fraction(2, 4))
 
 
 # ------------ RESULT -------------
