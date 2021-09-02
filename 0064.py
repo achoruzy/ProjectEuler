@@ -34,28 +34,25 @@ def total_part(num: float or int) -> int:
     return closest_square
 
 
-def one_divide_by_irrational(irr_prt: int, tot_prt: int) -> float:
-    """Finds irrational (fraction) part of irrational number.
-    """
-    result = (sqrt(irr_prt) + tot_prt)/(irr_prt - tot_prt**2)
-    return abs(result)
-
-
 def continued_fraction(num: int, lenght: int) -> list:
+    """Generates list notation for continued fraction representations of (irrational) square roots.
+    """
     result_list = []
 
     sqr = sqrt(num)
 
+    # First digit
     total = total_part(num)
     result_list.append(total)
 
     irrational = sqr - total
 
+    # Next digits
     while len(result_list) < lenght:
 
-        irrational_under_one = one_divide_by_irrational(irrational, total)
+        irrational_under_one = irrational**(-1)
 
-        total = total_part(irrational_under_one)  # tu jest blad
+        total = int(irrational_under_one)
         result_list.append(total)
         print(total, irrational_under_one)
 
@@ -77,17 +74,14 @@ def test_total_part():
     assert 10 == total_part(108)
 
 
-def test_one_divide_by_irrational():
-    pass
-
-
 def test_continued_fraction():
     pass
 
 
 # --------------- RUN ---------------
 if __name__ == '__main__':
-    print(continued_fraction(2, 4))
+    print(continued_fraction(23, 14))
+    print(continued_fraction(12, 14))
 
 
 # ------------ RESULT -------------
