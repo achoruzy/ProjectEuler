@@ -60,6 +60,33 @@ def continued_fraction(num: int, lenght: int) -> list:
 
     return result_list
 
+
+def count_period(list_to_check: list) -> int:
+    """Counts quantity of perioded numbers in list.
+    """
+    del list_to_check[0]
+    list_len = len(list_to_check)
+
+    for start in range(0, int(list_len/4)):
+        stop = start + 1
+
+        while stop <= list_len/2:
+            ss_difference = stop - start
+            base = list_to_check[start: stop]
+
+            for i in range(1, 5):
+                check = list_to_check[start+ss_difference*i:
+                                      stop+ss_difference*i]
+                if check != base:
+                    break
+
+                return ss_difference
+
+            stop += 1
+
+    return 0
+
+
 # -------------- TESTS ---------------
 
 
@@ -75,13 +102,18 @@ def test_total_part():
 
 
 def test_continued_fraction():
-    pass
+    assert [4, 1, 3, 1, 8, 1, 3, 1, 8, 1] == continued_fraction(23, 10)
+
+
+def test_count_period():
+    check_list = [4, 1, 3, 1, 8, 1, 3, 1, 8, 1]
+    assert 4 == count_period(check_list)
+
+    check_list_2 = continued_fraction(23, 100)
+    assert 4 == count_period(check_list_2)
 
 
 # --------------- RUN ---------------
 if __name__ == '__main__':
-    print(continued_fraction(23, 14))
-    print(continued_fraction(12, 14))
 
-
-# ------------ RESULT -------------
+    # ------------ RESULT -------------
