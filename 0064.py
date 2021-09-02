@@ -65,27 +65,24 @@ def count_period(list_to_check: list) -> int:
     """
     del list_to_check[0]
     list_len = len(list_to_check)
-    for start in range(0, int(list_len/4)):
+    for start in range(0, int(list_len/2)):
         stop = start + 1
 
-        while stop <= list_len/2:
+        while stop <= list_len:
             ss_difference = stop - start
             base = list_to_check[start: stop]
 
             check_count = 0
-            for i in range(1, 3):
+            for i in range(1, 4):  # ???
                 check = list_to_check[start+ss_difference*i:
                                       stop+ss_difference*i]
-                check_count += 1
                 if check != base:
-                    print('!', check)
                     check_count = 0
                     break
 
-            print(base)
+                check_count += 1
 
-            print(check_count)
-            if check_count:
+            if check_count > 0:
                 return ss_difference
 
             stop += 1
@@ -120,7 +117,6 @@ def main(check_range: int) -> int:
         counted_period = count_period(checked_root)
         if counted_period % 2 != 0:
             odd_counter += 1
-            print(i)
 
     return odd_counter
 
@@ -143,13 +139,13 @@ def test_continued_fraction():
 
 
 def test_count_period():
-    check_list = [4, 1, 3, 1, 8, 1, 3, 1, 8, 1]
+    check_list = [4, 1, 3, 1, 8, 1, 3, 1, 8, 1, 3, 1, 8]
     assert 4 == count_period(check_list)
 
     check_list_2 = continued_fraction(23, 100)
     assert 4 == count_period(check_list_2)
 
-    check_list_3 = continued_fraction(7, 30)
+    check_list_3 = continued_fraction(7, 100)
     assert 4 == count_period(check_list_3)
 
 
@@ -159,7 +155,7 @@ def test_good_root():
 
 # --------------- RUN ---------------
 if __name__ == '__main__':
-    print(main(13))
+    print(main(10000))
 
 
 # ------------ RESULT -------------
