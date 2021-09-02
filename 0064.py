@@ -54,7 +54,6 @@ def continued_fraction(num: int, lenght: int) -> list:
 
         total = int(irrational_under_one)
         result_list.append(total)
-        print(total, irrational_under_one)
 
         irrational = irrational_under_one - total
 
@@ -66,7 +65,6 @@ def count_period(list_to_check: list) -> int:
     """
     del list_to_check[0]
     list_len = len(list_to_check)
-
     for start in range(0, int(list_len/4)):
         stop = start + 1
 
@@ -74,18 +72,57 @@ def count_period(list_to_check: list) -> int:
             ss_difference = stop - start
             base = list_to_check[start: stop]
 
-            for i in range(1, 5):
+            check_count = 0
+            for i in range(1, 3):
                 check = list_to_check[start+ss_difference*i:
                                       stop+ss_difference*i]
+                check_count += 1
                 if check != base:
+                    print('!', check)
+                    check_count = 0
                     break
 
+            print(base)
+
+            print(check_count)
+            if check_count:
                 return ss_difference
 
             stop += 1
 
     return 0
 
+
+def good_root(num: int) -> bool:
+    """Checks if root of number is rational.
+    """
+    sqroot = int(sqrt(num))
+    square = sqroot**2
+
+    if square == num:
+        return True
+
+    return False
+
+
+def main(check_range: int) -> int:
+
+    odd_counter = 0
+
+    for i in range(2, check_range+1):
+
+        # Remove good roots
+        if good_root(i):
+            continue
+
+        # Counting odds
+        checked_root = continued_fraction(i, 50)
+        counted_period = count_period(checked_root)
+        if counted_period % 2 != 0:
+            odd_counter += 1
+            print(i)
+
+    return odd_counter
 
 # -------------- TESTS ---------------
 
@@ -112,8 +149,17 @@ def test_count_period():
     check_list_2 = continued_fraction(23, 100)
     assert 4 == count_period(check_list_2)
 
+    check_list_3 = continued_fraction(7, 30)
+    assert 4 == count_period(check_list_3)
+
+
+def test_good_root():
+    assert True == good_root(9)
+
 
 # --------------- RUN ---------------
 if __name__ == '__main__':
+    print(main(13))
 
-    # ------------ RESULT -------------
+
+# ------------ RESULT -------------
