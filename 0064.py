@@ -65,29 +65,36 @@ def count_period(list_to_check: list) -> int:
     """
     del list_to_check[0]
     list_len = len(list_to_check)
-    for start in range(0, int(list_len/2)):
+
+    max_len_period = 0
+
+    for start in range(0, 20):
         stop = start + 1
 
-        while stop <= list_len:
+        while stop <= list_len/2:
             ss_difference = stop - start
             base = list_to_check[start: stop]
 
-            check_count = 0
-            for i in range(1, 4):  # ???
-                check = list_to_check[start+ss_difference*i:
-                                      stop+ss_difference*i]
-                if check != base:
-                    check_count = 0
-                    break
+            check_1 = list_to_check[start+ss_difference:
+                                    stop+ss_difference]
+            check_2 = list_to_check[start+ss_difference*2:
+                                    stop+ss_difference*2]
+            check_3 = list_to_check[start+ss_difference*3:
+                                    stop+ss_difference*3]
+            # check_4 = list_to_check[start+ss_difference*4:
+            #                         stop+ss_difference*4]
 
-                check_count += 1
+            if len(set(base)) == 1 and len(base) != 1:
+                stop += 1
+                continue
 
-            if check_count > 0:
-                return ss_difference
+            if base == check_1 == check_2 == check_3:
+                if len(base) > max_len_period:
+                    max_len_period = len(base)
 
             stop += 1
 
-    return 0
+    return max_len_period
 
 
 def good_root(num: int) -> bool:
@@ -116,6 +123,7 @@ def main(check_range: int) -> int:
         checked_root = continued_fraction(i, 50)
         counted_period = count_period(checked_root)
         if counted_period % 2 != 0:
+            print(i, counted_period)
             odd_counter += 1
 
     return odd_counter
@@ -139,8 +147,8 @@ def test_continued_fraction():
 
 
 def test_count_period():
-    check_list = [4, 1, 3, 1, 8, 1, 3, 1, 8, 1, 3, 1, 8]
-    assert 4 == count_period(check_list)
+    check_list = continued_fraction(10, 100)
+    assert 1 == count_period(check_list)
 
     check_list_2 = continued_fraction(23, 100)
     assert 4 == count_period(check_list_2)
