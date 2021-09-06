@@ -39,23 +39,21 @@ def continued_fraction(num: int, lenght: int) -> list:
     """
     result_list = []
 
-    sqr = sqrt(num)
+    m = 0
+    d = 1
+    a = a0 = int(sqrt(num))
 
-    # First digit
-    total = total_part(num)
-    result_list.append(total)
+    result_list.append(a)
 
-    irrational = sqr - total
+    count = 0
+    while count < lenght-1:
+        m = d * a - m
+        d = (num - m**2)/d
+        a = int((a0 + m)/d)
 
-    # Next digits
-    while len(result_list) < lenght:
+        result_list.append(a)
 
-        irrational_under_one = irrational**(-1)
-
-        total = int(irrational_under_one)
-        result_list.append(total)
-
-        irrational = irrational_under_one - total
+        count += 1
 
     return result_list
 
@@ -63,38 +61,14 @@ def continued_fraction(num: int, lenght: int) -> list:
 def count_period(list_to_check: list) -> int:
     """Counts quantity of perioded numbers in list.
     """
-    del list_to_check[0]
-    list_len = len(list_to_check)
 
-    max_len_period = 0
+    count = 0
+    for i in list_to_check[1:]:
+        count += 1
+        if i == 2*list_to_check[0]:
+            break
 
-    for start in range(0, 20):
-        stop = start + 1
-
-        while stop <= list_len/2:
-            ss_difference = stop - start
-            base = list_to_check[start: stop]
-
-            check_1 = list_to_check[start+ss_difference:
-                                    stop+ss_difference]
-            check_2 = list_to_check[start+ss_difference*2:
-                                    stop+ss_difference*2]
-            check_3 = list_to_check[start+ss_difference*3:
-                                    stop+ss_difference*3]
-            # check_4 = list_to_check[start+ss_difference*4:
-            #                         stop+ss_difference*4]
-
-            if len(set(base)) == 1 and len(base) != 1:
-                stop += 1
-                continue
-
-            if base == check_1 == check_2 == check_3:
-                if len(base) > max_len_period:
-                    max_len_period = len(base)
-
-            stop += 1
-
-    return max_len_period
+    return count
 
 
 def good_root(num: int) -> bool:
@@ -120,11 +94,11 @@ def main(check_range: int) -> int:
             continue
 
         # Counting odds
-        checked_root = continued_fraction(i, 50)
+        checked_root = continued_fraction(i, 1000)
         counted_period = count_period(checked_root)
         if counted_period % 2 != 0:
-            print(i, counted_period)
             odd_counter += 1
+            # print(i, counted_period, odd_counter)
 
     return odd_counter
 
